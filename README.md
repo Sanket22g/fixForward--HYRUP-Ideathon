@@ -72,6 +72,20 @@ MSME-Guard retrofits **legacy industrial machines** with a low-cost AIoT sensor 
 
 ---
 
+## 🤖 AI Agent (CrewAI)
+
+The `crewai_agent/` folder contains a **multi-agent AI pipeline** powered by [CrewAI](https://github.com/joaomdmoura/crewAI):
+
+| Agent | What it does |
+|---|---|
+| 🔍 Fault Analyst | Reads sensor data → identifies fault type & severity |
+| 💰 Cost Advisor | Calculates repair vs failure cost in INR |
+| 📋 Action Coordinator | Writes a plain-English report for the owner |
+
+> See [`crewai_agent/README.md`](./crewai_agent/README.md) for setup & usage.
+
+---
+
 ## ⚙️ Getting Started
 
 ```bash
