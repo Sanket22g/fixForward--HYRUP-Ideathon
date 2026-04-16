@@ -1,119 +1,32 @@
-> [!CAUTION]
-> **🔌 Hardware Required for Live Mode**
-> The **"Connect Live Device"** feature requires physical MSME-Guard IoT hardware (ESP32 + sensors) to be connected on the same local network.
-> **Without hardware, use "View Demo"** — the app runs fully in the browser with realistic mock data. No setup needed.
-
----
-
-# 🛡️ MSME-Guard — Predictive Maintenance for Indian MSMEs
+# 🛡️ MSME-Guard — Hybrid Predictive Maintenance System
 
 > **Hackathon Prototype** · FixForward HYRUP Ideathon 2026
 
-MSME-Guard is a mobile-first AIoT dashboard that helps small manufacturers prevent costly machine breakdowns using real-time sensor data and predictive analytics.
+MSME-Guard is a **mobile-first AIoT platform** for Indian MSMEs that predicts machine failures before they happen — combining real ML models, a FastAPI backend, and a CrewAI multi-agent advisory layer.
 
 ---
 
-## 🚀 Live Demo
+## 🧠 How It Works — Hybrid Architecture
 
-Deployed on Vercel / Netlify — no backend required. Everything runs in the browser using mock data.
-
----
-
-## ⚠️ Important: Live Device Mode
-
-> **The "Connect Live Device" button requires physical MSME-Guard hardware to function.**
-
-The live device connection is designed to pair with our custom IoT retrofit kit:
-
-| Component | Detail |
-|---|---|
-| Vibration Sensor | ADXL345 (3-axis accelerometer) |
-| Temperature Sensor | DS18B20 |
-| Microcontroller | ESP32 (Wi-Fi enabled) |
-| Protocol | MQTT over local Wi-Fi |
-| Edge AI | TFLite bearing fault model |
-
-**Without hardware**, the app runs in full **Demo Mode** using realistic data sampled from Nashik MIDC MSME machinery.
-
----
-
-## 🎯 Project Overview
-
-MSME-Guard retrofits **legacy industrial machines** with a low-cost AIoT sensor kit that:
-
-1. **Monitors** vibration, temperature, and acoustic signals in real-time
-2. **Predicts** failures 24–72 hours before they occur using edge ML models
-3. **Alerts** owners instantly via the mobile dashboard
-4. **Quantifies** savings — e.g., ₹1,200 repair vs ₹47,000 breakdown cost
-
-### Why it matters
-- 63 million MSMEs in India operate legacy machines with **zero predictive maintenance**
-- Unplanned downtime costs **₹2–8 lakh per incident** on average
-- Our solution costs **under ₹3,000** per machine to deploy
-
----
-
-## 📱 App Screens
-
-| Screen | Description |
-|---|---|
-| **Landing** | Entry point with demo / device connect options |
-| **Dashboard** | Live machine health, cost comparison, action buttons |
-
----
-
-## 🛠️ Tech Stack
-
-- **React 18** + **Vite** (TypeScript)
-- **Tailwind CSS** — dark theme, mobile-first
-- **Lucide React** — icons
-- **Sonner** — toast notifications
-- **No backend** — all mock data in component state
-
----
-
-## 🤖 AI Agent (CrewAI)
-
-The `crewai_agent/` folder contains a **multi-agent AI pipeline** powered by [CrewAI](https://github.com/joaomdmoura/crewAI):
-
-| Agent | What it does |
-|---|---|
-| 🔍 Fault Analyst | Reads sensor data → identifies fault type & severity |
-| 💰 Cost Advisor | Calculates repair vs failure cost in INR |
-| 📋 Action Coordinator | Writes a plain-English report for the owner |
-
-> See [`crewai_agent/README.md`](./crewai_agent/README.md) for setup & usage.
-
----
-
-## ⚙️ Getting Started
-
-```bash
-# Install dependencies
-npm install
-
-# Start dev server
-npm run dev
-
-# Build for production
-npm run build
 ```
-
-Open [http://localhost:5173](http://localhost:5173) in your browser.
-
----
-
-## 🚢 Deployment
-
-### Vercel
-```bash
-npx vercel --prod
-```
-
-### Netlify
-```bash
-npm run build
-# Drag & drop the `dist/` folder to Netlify
+IoT Sensors (ESP32)
+       │
+       ▼
+ FastAPI Backend  ──→  ML Models (scikit-learn)
+  (Api_cnc/)              ├─ Isolation Forest  (anomaly detection)
+       │                  ├─ Random Forest RUL (remaining useful life)
+       │                  └─ Fault Classifier  (bearing / imbalance / etc.)
+       │
+       ▼
+ CrewAI Agent Pipeline
+  (crewai_agent/)
+       ├─ Fault Analyst Agent   → interprets ML output
+       ├─ Cost Advisor Agent    → repair vs failure cost (INR)
+       └─ Action Agent          → plain-English report for owner
+       │
+       ▼
+ React Dashboard (Mobile UI)
+  (src/)  →  Shows alert, cost card, action buttons
 ```
 
 ---
@@ -121,24 +34,172 @@ npm run build
 ## 📁 Project Structure
 
 ```
-src/
-├── pages/
-│   ├── LandingPage.tsx    # Screen 1 — Hero & CTAs
-│   └── Dashboard.tsx      # Screen 2 — Machine alert & actions
-├── components/
-│   ├── CallModal.tsx      # Simulated call overlay
-│   └── ActivityLog.tsx    # Timeline log
-├── App.tsx                # Screen navigation state
-└── index.css              # Global styles & animations
+msme-guard/
+│
+├── Api_cnc/                   # 🔧 FastAPI ML Backend
+│   ├── api.py                 # REST endpoints + ML inference logic
+│   ├── requirements.txt       # Python dependencies
+│   ├── Dockerfile             # Container deployment
+│   └── model/                 # Trained ML model files (.pkl)
+│       ├── anomaly.pkl        # Isolation Forest — anomaly detection
+│       ├── rul_model.pkl      # Random Forest — Remaining Useful Life
+│       ├── rul_scaler.pkl     # Feature scaler for RUL model
+│       ├── fault_classifier.pkl  # Fault type classifier
+│       ├── label_encoder.pkl  # Fault label encoder
+│       └── features.pkl       # Feature column list
+│
+├── crewai_agent/              # 🤖 CrewAI Multi-Agent Pipeline
+│   ├── main.py                # 3-agent advisory system
+│   ├── requirements.txt
+│   └── README.md
+│
+└── src/                       # 📱 React Frontend (Mobile Dashboard)
+    ├── pages/
+    │   ├── LandingPage.tsx
+    │   └── Dashboard.tsx
+    ├── components/
+    │   ├── CallModal.tsx
+    │   └── ActivityLog.tsx
+    └── App.tsx
 ```
 
 ---
 
-## 👥 Team
+## 🔧 ML Backend — `Api_cnc/`
 
-**Team HYRUP** · FixForward Ideathon 2026  
-Built with ❤️ for Indian MSMEs
+Built with **FastAPI** + **scikit-learn**. Loads pre-trained `.pkl` models and serves predictions via REST API.
+
+### ML Models Used
+
+| Model | Algorithm | Purpose |
+|---|---|---|
+| `anomaly.pkl` | Isolation Forest | Detect abnormal sensor patterns |
+| `rul_model.pkl` | Random Forest Regressor | Predict days remaining before failure |
+| `fault_classifier.pkl` | Random Forest Classifier | Classify fault type (bearing, imbalance, etc.) |
+
+### Health Score Formula
+
+```
+Health Score = 0.60 × RUL_norm
+             + 0.25 × (1 − anomaly_score)
+             + 0.10 × (1 − vibration_penalty)
+             + 0.05 × (1 − thermal_penalty)
+```
+
+### API Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/` | Health check |
+| `POST` | `/predict_features` | Run full ML inference → returns health score, fault type, RUL, cost analysis |
+
+### Sample Request
+
+```json
+POST /predict_features
+{
+  "machine_id": "CNC-03",
+  "features": {
+    "vibration_rms_g": 4.82,
+    "temperature_c": 73.4,
+    "kurtosis": 6.1,
+    "crest_factor": 4.3,
+    "severity_mm_s": 4.82,
+    "rpm": 1500
+  }
+}
+```
+
+### Sample Response
+
+```json
+{
+  "machine_id": "CNC-03",
+  "health_score": 38.2,
+  "alert": "🔶 WARNING",
+  "dominant_fault": "bearing_wear",
+  "fault_confidence": 87.4,
+  "rul_days": 2.1,
+  "repair_now_cost": 1200,
+  "run_to_fail_cost": 47000,
+  "savings_if_repaired": 45800,
+  "recommendation": "Schedule bearing repair immediately. Estimated RUL: 2 days."
+}
+```
+
+### Run Locally
+
+```bash
+cd Api_cnc
+pip install -r requirements.txt
+uvicorn api:app --reload --port 8000
+```
+
+Or with Docker:
+
+```bash
+docker build -t msme-guard-api .
+docker run -p 8000:8000 msme-guard-api
+```
 
 ---
 
-*"A machine is about to fail. We tell you before it does."*
+## 🤖 AI Agent Layer — `crewai_agent/`
+
+Built with **CrewAI**. Three agents run sequentially after the ML backend produces a fault reading:
+
+| Agent | Role |
+|---|---|
+| 🔍 Fault Analyst | Interprets sensor data and ML output — identifies fault type & severity |
+| 💰 Cost Advisor | Estimates repair cost vs full failure cost in INR with ROI |
+| 📋 Action Coordinator | Writes a plain-English 150-word report the factory owner can act on in 30 seconds |
+
+```bash
+cd crewai_agent
+pip install -r requirements.txt
+set OPENAI_API_KEY=sk-your-key-here
+python main.py
+```
+
+---
+
+## 📱 Frontend — React Dashboard
+
+Mobile-first dark-theme UI built with **React + Vite + Tailwind CSS**.
+
+```bash
+npm install
+npm run dev
+```
+
+Open **http://localhost:5173**
+
+### Deploy
+
+```bash
+# Vercel
+npx vercel --prod
+
+# Netlify — build then drag dist/ folder
+npm run build
+```
+
+---
+
+## 🛠️ Full Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | React 18 + Vite + TypeScript |
+| Styling | Tailwind CSS (dark theme, mobile-first) |
+| ML Models | scikit-learn (Isolation Forest, Random Forest) |
+| API | FastAPI + Uvicorn |
+| AI Agents | CrewAI (GPT-4 powered) |
+| IoT | ESP32 + ADXL345 + DS18B20 (hardware layer) |
+| Containerisation | Docker |
+
+---
+
+## ⚠️ Hardware Note
+
+The **"Connect Live Device"** button in the UI requires physical MSME-Guard IoT hardware (ESP32 + sensors) on the same local network. Without hardware, click **"View Demo"** — the app runs fully in the browser using realistic mock data from Nashik MIDC.
