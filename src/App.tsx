@@ -1,27 +1,34 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import Index from "./pages/Index.tsx";
-import NotFound from "./pages/NotFound.tsx";
+import { useState } from 'react';
+import { Toaster } from 'sonner';
+import LandingPage from './pages/LandingPage';
+import Dashboard from './pages/Dashboard';
 
-const queryClient = new QueryClient();
+export type Screen = 'landing' | 'dashboard';
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+function App() {
+  const [screen, setScreen] = useState<Screen>('landing');
+
+  return (
+    <>
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          style: {
+            background: '#1a2235',
+            border: '1px solid rgba(255,255,255,0.1)',
+            color: '#f1f5f9',
+            borderRadius: '12px',
+            fontSize: '14px',
+          },
+        }}
+      />
+      {screen === 'landing' ? (
+        <LandingPage onNavigate={setScreen} />
+      ) : (
+        <Dashboard onNavigate={setScreen} />
+      )}
+    </>
+  );
+}
 
 export default App;

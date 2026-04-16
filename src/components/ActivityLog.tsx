@@ -1,34 +1,55 @@
-interface LogEntry {
+interface LogItem {
   time: string;
-  event: string;
-  tone?: "danger" | "success" | "default";
+  text: string;
+  icon: string;
 }
 
-const entries: LogEntry[] = [
-  { time: "2:14 AM", event: "Fault detected", tone: "danger" },
-  { time: "2:14 AM", event: "Alert generated", tone: "danger" },
-  { time: "2:15 AM", event: "Call initiated", tone: "default" },
-  { time: "2:16 AM", event: "Mechanic dispatched", tone: "success" },
-];
+interface Props {
+  items: LogItem[];
+}
 
-const toneClass = (t?: LogEntry["tone"]) =>
-  t === "danger" ? "bg-danger" : t === "success" ? "bg-success" : "bg-muted-foreground/60";
-
-export const ActivityLog = () => {
+export default function ActivityLog({ items }: Props) {
   return (
-    <section aria-label="Activity log" className="rounded-2xl bg-card p-5 sm:p-6">
-      <h2 className="text-xs uppercase tracking-wider text-muted-foreground font-semibold mb-4">
-        Activity
-      </h2>
-      <ol className="space-y-3">
-        {entries.map((e, i) => (
-          <li key={i} className="flex items-center gap-3 text-sm">
-            <span className={`h-1.5 w-1.5 rounded-full ${toneClass(e.tone)}`} />
-            <span className="text-muted-foreground tabular w-16 shrink-0">{e.time}</span>
-            <span className="text-foreground/90">{e.event}</span>
-          </li>
-        ))}
-      </ol>
-    </section>
+    <div
+      className="rounded-2xl p-4 slide-up"
+      style={{
+        animationDelay: '0.2s',
+        background: 'rgba(255,255,255,0.03)',
+        border: '1px solid rgba(255,255,255,0.07)',
+      }}
+    >
+      <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-4">Activity Log</p>
+
+      <div className="relative">
+        {/* Vertical line */}
+        <div
+          className="absolute left-[22px] top-2 bottom-2 w-px"
+          style={{ background: 'linear-gradient(to bottom, rgba(34,197,94,0.4), rgba(34,197,94,0.05))' }}
+        />
+
+        <div className="flex flex-col gap-3">
+          {items.map((item, idx) => (
+            <div key={idx} className="flex items-center gap-3 pl-1 scale-in" style={{ animationDelay: `${idx * 0.05}s` }}>
+              {/* Dot */}
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-base z-10"
+                style={{
+                  background: 'rgba(34,197,94,0.08)',
+                  border: '1px solid rgba(34,197,94,0.2)',
+                }}
+              >
+                {item.icon}
+              </div>
+              <div className="flex-1">
+                <p className="text-xs text-slate-500 font-mono">{item.time}</p>
+                <p className="text-sm text-slate-200 font-medium">{item.text}</p>
+              </div>
+              {/* Checkmark for completed */}
+              <span className="text-green-500 text-xs">✓</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
-};
+}
